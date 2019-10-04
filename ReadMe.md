@@ -102,7 +102,7 @@ Based on the analysis we made of the problem and given the constraints, we will:
 3. Build a 3-class classifier (`solution`, `root_cause`, `other`) at the sentence level.
     1. The model:
         - A +/- advanced model would be to use the content from **both** the sentence **and** the question to predict the class of the sentence: ![equation](https://latex.codecogs.com/gif.latex?\mathbb{P}(label=solution&space;|&space;question,&space;sentence&space;))
-        - We will adopt a simpler approach and **only** use the content from the sentence: ![equation](https://latex.codecogs.com/gif.latex?\mathbb{P}(label=solution&space;|&space;sentence&space;)). Our rational the `solution` class could be predicted by textual elements such as {`I suggest that`, `you should do`} and that an top-voted answer is related enough to the question that we do not need to check for the relevance of the sentence with respect to the initial question.
+        - We will adopt a simpler approach and **only** use the content from the sentence: ![equation](https://latex.codecogs.com/gif.latex?\mathbb{P}(label=solution&space;|&space;sentence&space;)). Our rational is that the `solution` class could be predicted by textual elements such as {`I suggest that`, `you should do`} and that an top-voted answer is related enough to the question that we do not need to check for the relevance of the sentence with respect to the initial question.
     2. The labels:
         - First try if an unsupervised approach could yield to well identified classes that includes  (`solution`, `root_cause`), this would avoid having to manually label sentences. Otherwise we'll have to do a bit of data labelling.
     3. Extracting sentences:
