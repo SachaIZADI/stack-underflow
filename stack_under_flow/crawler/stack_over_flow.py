@@ -49,7 +49,7 @@ class StackOverflowCrawler:
         return sample_questions
 
 
-class StackOverflowDataSet:
+class StackOverflowDataCollector:
 
     def __init__(self, api_key: str = None, dst_file: str = None):
         self.api_key = api_key
@@ -77,8 +77,8 @@ class StackOverflowDataSet:
             if question_data["accepted_answer_id"] is not None:
                 raw_answer_data = self.crawler.get_answer_by_id(id=question_data["accepted_answer_id"])
                 data.update({
-                    "answer_body": raw_answer_data["items"][0]["body"]
+                    "answer_body": raw_answer_data[0]["body"]
                 })
 
             complete_data.append(data)
-
+        return complete_data

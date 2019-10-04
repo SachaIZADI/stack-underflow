@@ -116,5 +116,7 @@ Based on the analysis we made of the problem and given the constraints, we will:
 
 
 ## 3. How to reproduce the code
+Run the tests: `PYTHONPATH=. py.test`
+
 
 Under construction
