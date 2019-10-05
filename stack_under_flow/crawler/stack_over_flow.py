@@ -1,5 +1,10 @@
 import requests
 from typing import List
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options
+import json
+from urllib.parse import urlparse, parse_qs
 
 
 class StackOverflowCrawler:
@@ -14,6 +19,58 @@ class StackOverflowCrawler:
             "quota_max": res_json["quota_max"],
             "quota_remaining": res_json["quota_remaining"]
         }
+
+    def generate_api_key(
+            self,
+            path_to_chrome_driver: str = '/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/crawler/chromedriver'
+    ):
+
+        caps = DesiredCapabilities.CHROME
+        caps['loggingPrefs'] = {'performance': 'ALL'}
+        caps["goog:loggingPrefs"] = {"performance": "ALL"}
+
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+
+        driver = webdriver.Chrome(
+            desired_capabilities=caps,
+            executable_path=path_to_chrome_driver,
+            chrome_options=chrome_options
+        )
+        driver.get("https://api.stackexchange.com/docs/answers-by-ids#order=desc&sort=activity&ids=31323566&site=stackoverflow&run=true")
+        browser_logs = driver.get_log('performance')
+        driver.quit()
+
+        def extract_key(logs: dict) -> str:
+            for log in logs:
+
+                message = json.loads(log["message"])["message"]
+
+                params = message.get("params")
+                if params is None:
+                    continue
+
+                req = params.get("request")
+                if req is None:
+                    continue
+
+                url = req.get("url")
+                if url is None:
+                    continue
+
+                if url.startswith("https://api.stackexchange.com/2.2/sites?") and "key=" in url:
+                    parsed = urlparse(url)
+                    key = parse_qs(parsed.query).get('key')
+                    if key is not None:
+                        return key[0]
+
+            return None
+
+        new_api_key = extract_key(logs=browser_logs)
+
+        if new_api_key is not None:
+            self.api_key = new_api_key
+
 
     def search_question_by_tag(self, tag: str) -> List[dict]:
         search_url = f"https://api.stackexchange.com/2.2/search?order=desc&sort=votes&tagged={tag}&site=stackoverflow"
