@@ -5,6 +5,7 @@ from typing import List
 def main(tags: List[str]):
 
     s = StackOverflowDataCollector()
+    s.crawler.generate_api_key()
     print("---- Starting to collect questions")
     q = s.collect_sample_questions(tags=tags)
     print("---- Starting to collect answers to questions")
@@ -18,4 +19,4 @@ def main(tags: List[str]):
 
 
 if __name__ == "__main__":
-    main(tags=["python"])
+    main(tags=["anaconda"])
