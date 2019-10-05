@@ -108,10 +108,9 @@ class StackOverflowCrawler:
 
 class StackOverflowDataCollector:
 
-    def __init__(self, api_key: str = None, dst_file: str = None):
+    def __init__(self, api_key: str = None):
         self.api_key = api_key
         self.crawler = StackOverflowCrawler(api_key=api_key)
-        self.dst_file = dst_file
 
     def collect_sample_questions(self, tags: list):
         raw_questions = self.crawler.get_sample_questions(tags=tags, is_answered=True)
@@ -140,3 +139,14 @@ class StackOverflowDataCollector:
 
             complete_data.append(data)
         return complete_data
+
+    @staticmethod
+    def save_data(data: List[dict], dst_file: str):
+
+        if not dst_file.endswith(".json"):
+            raise NotImplementedError("Only JSON output format is currently supported")
+
+        with open(dst_file, 'w') as f:
+            json.dump(data, f)
+
+        print(f"Data was saved to {dst_file}")
