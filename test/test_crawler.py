@@ -1,5 +1,6 @@
 from stack_under_flow.crawler import StackOverflowCrawler, StackOverflowDataCollector
 
+
 class TestStackOverflowCrawlers:
 
     def test_get_question_by_id(self):
@@ -17,11 +18,8 @@ class TestStackOverflowCrawlers:
         res = s.get_sample_questions(tags=["python", "java"])
         assert len(res) > 0
 
-
-    # TODO: StackOverflowDataCollector
-    """
-    s= StackOverflowDataCollector()
-    q = s.collect_sample_questions(tags=["python"])
-    a = s.collect_answers(clean_questions=q)
-    """
-
+    def test_data_collector(self):
+        s = StackOverflowDataCollector()
+        q = s.collect_sample_questions(tags=["python"])
+        a = s.collect_answers(clean_questions=q)
+        assert len(a) > 0

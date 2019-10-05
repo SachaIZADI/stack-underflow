@@ -73,14 +73,14 @@ class StackOverflowCrawler:
 
 
     def search_question_by_tag(self, tag: str) -> List[dict]:
-        search_url = f"https://api.stackexchange.com/2.2/search?order=desc&sort=votes&tagged={tag}&site=stackoverflow"
+        search_url = f"https://api.stackexchange.com/2.2/search?order=desc&sort=votes&tagged={tag}&site=stackoverflow&filter=!9Z(-wwYGT"
         res = requests.get(search_url, params={"key": self.api_key})
         res_json = res.json()
         self.quota = self.get_quota(res_json)
         return res_json["items"]
 
     def get_questions_by_id(self, id: int) -> dict:
-        question_url = f"https://api.stackexchange.com/2.2/questions/{id}?order=desc&sort=activity&site=stackoverflow"
+        question_url = f"https://api.stackexchange.com/2.2/questions/{id}?order=desc&sort=activity&site=stackoverflow&filter=!9Z(-wwYGT"
         res = requests.get(question_url, params={"key": self.api_key})
         res_json = res.json()
         self.quota = self.get_quota(res_json)
@@ -118,6 +118,7 @@ class StackOverflowDataCollector:
         clean_questions = [
             {
                 "title": raw_question.get("title", None),
+                "question_body": raw_question.get("body", None),
                 "link": raw_question.get("link", None),
                 "question_id": raw_question.get("question_id", None),
                 "accepted_answer_id": raw_question.get("accepted_answer_id", None),
