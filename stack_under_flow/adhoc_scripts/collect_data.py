@@ -19,4 +19,4 @@ def main(tags: List[str]):
 
 
 if __name__ == "__main__":
-    main(tags=["anaconda"])
+    main(tags=["selenium"])
