@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import gensim
 from typing import List, Iterable
 import numpy as np
+import nltk
+
 
 
 class Preprocessor(BaseEstimator, TransformerMixin):
@@ -172,7 +174,11 @@ class Preprocessor(BaseEstimator, TransformerMixin):
 
     # --
 
-    def get_sentences(self, document: str, remove_punctuation: bool = True) -> List[str]:
+    def get_sentences(self,
+                      document: str,
+                      remove_punctuation: bool = True,
+                      lemmatize: bool = True) -> List[str]:
+
         sentences = gensim.summarization.textcleaner.get_sentences(document)
 
         def merge_sentence_with_code_snippet(sentences):
@@ -185,8 +191,19 @@ class Preprocessor(BaseEstimator, TransformerMixin):
         sentences = merge_sentence_with_code_snippet(sentences)
 
         if remove_punctuation:
-            sentences = [re.sub('[!?.,:;\-]', ' ', sentence) for sentence in sentences]
+            sentences = [re.sub('[!?.,:;\-\(\)\'\"]', ' ', sentence) for sentence in sentences]
 
+        if lemmatize:
+            def full_lematize(word: str) -> str:
+                lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
+                word = lemmatizer.lemmatize(word, "v")
+                word = lemmatizer.lemmatize(word, "a")
+                word = lemmatizer.lemmatize(word)
+                return word
+            sentences = [
+                " ".join([full_lematize(word) for word in sentence.split()])
+                for sentence in sentences
+            ]
         return list(sentences)
 
     # --
@@ -209,12 +226,27 @@ class Preprocessor(BaseEstimator, TransformerMixin):
             window=10,
             min_count=2,
             workers=2,
-            iter=10)
+            iter=20)
 
         return model
 
+    # --
+
     def save_Word2Vec(self, dst_file: str):
         self.word2vec_model.save(dst_file)
+
+    # --
+
+    def vectorize_word(self, word: str) -> np.array:
+        if word not in self.word2vec_model.wv:
+            return
+        else:
+            return self.word2vec_model.wv[word]
+
+    # --
+
+    def vectorize_words(self, words: List[str]):
+        return np.array([self.vectorize_word(word) for word in words if self.vectorize_word(word) is not None])
 
     # --------------------------
 
@@ -240,98 +272,38 @@ class Preprocessor(BaseEstimator, TransformerMixin):
         return self
 
 
-    def transform(self, X, y=None):
-        X_transformed = self.html_2_text(X)
-        X_transformed = self.expand_contraction(X_transformed)
-        X_transformed = self.get_sentences(X_transformed)
+    def transform(self, X: Iterable[str], y=None, vectorize=True):
+        html_2_text_vect = np.vectorize(self.html_2_text)
+        expand_contraction_vect = np.vectorize(self.expand_contraction)
+        get_sentences_vect = np.vectorize(self.get_sentences, otypes=[list])
+        get_tokens_from_sentences_vect = np.vectorize(self.get_tokens_from_sentences, otypes=[list])
 
-        # TODO: Under construction
-        return list(X_transformed)
+        X_transformed = html_2_text_vect(X)
+        X_transformed = expand_contraction_vect(X_transformed)
+        X_transformed = get_sentences_vect(X_transformed)
+        X_transformed = get_tokens_from_sentences_vect(X_transformed)
+
+        if not vectorize:
+            return X_transformed
+
+        X_transformed_final = []
+
+        for x_document in X_transformed:
+
+            X_transformed_final.append(
+                [self.vectorize_words(x_sentence) for x_sentence in x_document]
+            )
+
+            break
+
+        return X_transformed_final
 
 
+
+"""
 if __name__ == "__main__":
 
     preprocessor = Preprocessor()
     html_doc = "<p>I am trying to reconcile my understand of LSTMs and pointed out here in <a href=\"http://colah.github.io/posts/2015-08-Understanding-LSTMs/\" rel=\"noreferrer\">this post by Christopher Olah</a> implemented in Keras. I am following the <a href=\"http://machinelearningmastery.com/time-series-prediction-lstm-recurrent-neural-networks-python-keras/\" rel=\"noreferrer\">blog written by Jason Brownlee</a> for the Keras tutorial. What I am mainly confused about is, </p>\n\n<ol>\n<li>The reshaping of the data series into <code>[samples, time steps, features]</code> and,</li>\n<li>The stateful LSTMs </li>\n</ol>\n\n<p>Lets concentrate on the above two questions with reference to the code pasted below:</p>\n\n<pre><code># reshape into X=t and Y=t+1\nlook_back = 3\ntrainX, trainY = create_dataset(train, look_back)\ntestX, testY = create_dataset(test, look_back)\n\n# reshape input to be [samples, time steps, features]\ntrainX = numpy.reshape(trainX, (trainX.shape[0], look_back, 1))\ntestX = numpy.reshape(testX, (testX.shape[0], look_back, 1))\n########################\n# The IMPORTANT BIT\n##########################\n# create and fit the LSTM network\nbatch_size = 1\nmodel = Sequential()\nmodel.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True))\nmodel.add(Dense(1))\nmodel.compile(loss='mean_squared_error', optimizer='adam')\nfor i in range(100):\n    model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)\n    model.reset_states()\n</code></pre>\n\n<p>Note: create_dataset takes a sequence of length N and returns a <code>N-look_back</code> array of which each element is a <code>look_back</code> length sequence.    </p>\n\n<h1>What is Time Steps and Features?</h1>\n\n<p>As can be seen TrainX is a 3-D array with Time_steps and Feature being the last two dimensions respectively (3 and 1 in this particular code). With respect to the image below, does this mean that we are considering the <code>many to one</code> case, where the number of pink boxes are 3? Or does it literally mean the chain length is 3 (i.e. only 3 green boxes considered). <a href=\"https://i.stack.imgur.com/kwhAP.jpg\" rel=\"noreferrer\"><img src=\"https://i.stack.imgur.com/kwhAP.jpg\" alt=\"enter image description here\"></a></p>\n\n<p>Does the features argument become relevant when we consider multivariate series? e.g. modelling two financial stocks simultaneously? </p>\n\n<h1>Stateful LSTMs</h1>\n\n<p>Does stateful LSTMs mean that we save the cell memory values between runs of batches? If this is the case, <code>batch_size</code> is one, and the memory is reset between the training runs so what was the point of saying that it was stateful. I'm guessing this is related to the fact that training data is not shuffled, but I'm not sure how.</p>\n\n<p>Any thoughts?\nImage reference: <a href=\"http://karpathy.github.io/2015/05/21/rnn-effectiveness/\" rel=\"noreferrer\">http://karpathy.github.io/2015/05/21/rnn-effectiveness/</a></p>\n\n<h2>Edit 1:</h2>\n\n<p>A bit confused about @van's comment about the red and green boxes being equal. So just to confirm, does the following API calls correspond to the unrolled diagrams? Especially noting the second diagram (<code>batch_size</code> was arbitrarily chosen.):\n<a href=\"https://i.stack.imgur.com/sW207.jpg\" rel=\"noreferrer\"><img src=\"https://i.stack.imgur.com/sW207.jpg\" alt=\"enter image description here\"></a>\n<a href=\"https://i.stack.imgur.com/15V2C.jpg\" rel=\"noreferrer\"><img src=\"https://i.stack.imgur.com/15V2C.jpg\" alt=\"enter image description here\"></a></p>\n\n<h2>Edit 2:</h2>\n\n<p>For people who have done Udacity's deep learning course and still confused about the time_step argument, look at the following discussion: <a href=\"https://discussions.udacity.com/t/rnn-lstm-use-implementation/163169\" rel=\"noreferrer\">https://discussions.udacity.com/t/rnn-lstm-use-implementation/163169</a></p>\n\n<h2>Update:</h2>\n\n<p>It turns out <code>model.add(TimeDistributed(Dense(vocab_len)))</code> was what I was looking for. Here is an example: <a href=\"https://github.com/sachinruk/ShakespeareBot\" rel=\"noreferrer\">https://github.com/sachinruk/ShakespeareBot</a></p>\n\n<h2>Update2:</h2>\n\n<p>I have summarised most of my understanding of LSTMs here: <a href=\"https://www.youtube.com/watch?v=ywinX5wgdEU\" rel=\"noreferrer\">https://www.youtube.com/watch?v=ywinX5wgdEU</a></p>\n"
     print(preprocessor.transform(html_doc))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # TODO:
-
-"""
-
-
-
-
-
-
-
-
-
-# Define a stopwords dictionnary :
-
-stopwords = nltk.corpus.stopwords.words('english')
-
-# We keep the negative adverbs
-stopwords.remove('no')
-stopwords.remove('not')
-
-# We remove the iphone and galaxy vocabulary
-stopwords.append('iphone')
-stopwords.append('apple')
-stopwords.append('samsung')
-stopwords.append('galaxy')
-stopwords.append('s8')
-
-print(stopwords)
-
-
- We want to keep the negative indicators (e.g. wouldn't --> keep not).
-# So we need to expand common English contractions
-# To do so, we use a bit of code from StackOverFlow
-
-
-
-
-def preprocessing(string):
-    string = str(string)
-    # lower_case
-    string = string.lower()
-    # remove accents
-    string = unidecode.unidecode(string)
-    # expand English contractions
-    string = expandContractions(string)
-    # remove stopwords
-    pattern = re.compile(r'\b(' + r'|'.join(stopwords) + r')\b\s*')
-    string = pattern.sub('', string)
-    # remove special caracters like "" and punctuation
-    string = re.sub('[^A-Za-z0-9 ]','', string)
-    # lematize
-    string = nltk.stem.wordnet.WordNetLemmatizer().lemmatize(string,"v")
-    string = nltk.stem.wordnet.WordNetLemmatizer().lemmatize(string,"a")
-    string = nltk.stem.wordnet.WordNetLemmatizer().lemmatize(string)
-    return(string)
-
-TFIDF_train = TfidfVectorizer(
-    input='content',
-    lowercase=False,
-    preprocessor=preprocessing
-)
-
-# https://scikit-learn.org/stable/modules/compose.html
-
 """
