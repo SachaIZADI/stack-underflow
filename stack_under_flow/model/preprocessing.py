@@ -191,7 +191,7 @@ class Preprocessor(BaseEstimator, TransformerMixin):
         sentences = merge_sentence_with_code_snippet(sentences)
 
         if remove_punctuation:
-            sentences = [re.sub('[!?.,:;\-\(\)\'\"]', ' ', sentence) for sentence in sentences]
+            sentences = [re.sub('[!?.,:;\-\(\)\'\"#*]', ' ', sentence) for sentence in sentences]
 
         if lemmatize:
             def full_lematize(word: str) -> str:

@@ -2,3 +2,4 @@
 **/chromedriver
 **/data
 **/*.model
+**/.ipynb_checkpoints
