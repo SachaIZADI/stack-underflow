@@ -272,7 +272,11 @@ class Preprocessor(BaseEstimator, TransformerMixin):
         return self
 
 
-    def transform(self, X: Iterable[str], y=None, vectorize=True):
+    def transform(self, X: Iterable[str], y=None, vectorize=True, reducer="mean"):
+
+        if reducer not in {"mean", None}:
+            raise NotImplementedError('Only reducer="mean" is implemented so far')
+
         html_2_text_vect = np.vectorize(self.html_2_text)
         expand_contraction_vect = np.vectorize(self.expand_contraction)
         get_sentences_vect = np.vectorize(self.get_sentences, otypes=[list])
@@ -294,7 +298,9 @@ class Preprocessor(BaseEstimator, TransformerMixin):
                 [self.vectorize_words(x_sentence) for x_sentence in x_document]
             )
 
-            break
+        if reducer is not None:
+            X_transformed_final = [np.array([x[i].sum(axis=0) for i in range(len(x))]) for x in X_transformed_final]
+
 
         return X_transformed_final
 
