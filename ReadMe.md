@@ -113,7 +113,10 @@ Based on the analysis we made of the problem and given the constraints, we will:
         - Train our own word embeddings
         - We also might use additional metadata (e.g. Markdown elements) as a solution.
 
-![](/img/tsne.gif)
+
+<img src = "/img/tsne.gif" height="200">
+
+<img src = "/img/labelling.gif" height="200">
 
 
 ## 3. How to reproduce the code
