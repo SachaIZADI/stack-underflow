@@ -114,9 +114,11 @@ Based on the analysis we made of the problem and given the constraints, we will:
         - We also might use additional metadata (e.g. Markdown elements) as a solution.
 
 
-<img src = "/img/tsne.gif" height="200">
+<img src = "/img/tsne.gif" height="400">
 
-<img src = "/img/labelling.gif" height="200">
+<img src = "/img/labelling.gif" height="400">
+
+<img src = "/img/classification_result.png" height="250">
 
 
 ## 3. How to reproduce the code

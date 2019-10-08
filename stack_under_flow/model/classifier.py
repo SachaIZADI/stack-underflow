@@ -1,5 +1,5 @@
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
@@ -8,7 +8,7 @@ from stack_under_flow.model.preprocessing import Preprocessor
 from typing import List, Iterable
 
 
-class Classifier(BaseEstimator, TransformerMixin):
+class Classifier(BaseEstimator, ClassifierMixin):
 
     def __init__(self, scaler_model_src: str = None, classifier_model_src: str = None):
         # TODO load model
@@ -17,7 +17,7 @@ class Classifier(BaseEstimator, TransformerMixin):
         else:
             raise NotImplementedError
         if classifier_model_src is None:
-            self.classifier = MultinomialNB()
+            self.classifier = GradientBoostingClassifier()
         else:
             raise NotImplementedError
 
@@ -26,7 +26,7 @@ class Classifier(BaseEstimator, TransformerMixin):
         self.classifier.fit(X_scaled, y)
         return self
 
-    def transform(self, X: np.array):
+    def predict(self, X: np.array):
         X_scaled = self.scaler.transform(X)
         return self.classifier.predict(X_scaled)
 
@@ -48,4 +48,7 @@ class ClassifierPipeline:
         )
 
     def predict(self, X: Iterable[str]):
+        # TODO
+        # - return proba
+        # - return label
         return
