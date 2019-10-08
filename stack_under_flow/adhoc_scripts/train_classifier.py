@@ -1,4 +1,4 @@
-from stack_under_flow.model.preprocessing import Preprocessor
+from stack_under_flow.model import Preprocessor
 from stack_under_flow.model.classifier import Classifier
 
 from sklearn.metrics import classification_report, confusion_matrix

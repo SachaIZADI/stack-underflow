@@ -54,12 +54,19 @@ class ClassifierPipeline:
         )
 
     def predict(self, X: Iterable[str], with_proba=False):
-        
+
         X_transformed = self.preprocessor.transform(X)
-        y_pred = self.classifier.predict(X_transformed)
+        # TODO: remove this patch
+        try:
+            y_pred = self.classifier.predict(X_transformed)
+        except:
+            y_pred = self.classifier.predict(X_transformed[0])
 
         if with_proba:
-            proba_pred = self.classifier.predict_proba(X_transformed)
+            try:
+                proba_pred = self.classifier.predict_proba(X_transformed)
+            except:
+                proba_pred = self.classifier.predict_proba(X_transformed[0])
 
             return y_pred, proba_pred
 

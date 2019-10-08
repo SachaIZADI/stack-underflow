@@ -1,9 +1,9 @@
-from stack_under_flow.model import Preprocessor
+from stack_under_flow.model import ClassifierPipeline
 
-class TestPreprocessor:
 
-    data_for_test_preprocessor = [
-        """
+class TestClassifierPipeline:
+
+    data_for_test_classifier_pipeline = """
         <p>To understand what <code>yield</code> does, you must understand what <em>generators</em> are. And before you can understand generators, you must understand <em>iterables</em>.</p>
 
     <h2>Iterables</h2>
@@ -244,73 +244,17 @@ class TestPreprocessor:
     Iterables are any objects you can get an iterator from. Iterators are objects that let you iterate on iterables.</p>
 
     <p>There is more about it in this article about <a href="http://effbot.org/zone/python-for-statement.htm" rel="noreferrer">how <code>for</code> loops work</a>.</p>
-        """,
         """
-        <p>Yes, it was <a href="https://mail.python.org/pipermail/python-dev/2005-September/056846.html" rel="noreferrer" title="[Python-Dev] Conditional Expression Resolution">added</a> in version 2.5. The expression syntax is:</p>
 
-    <pre><code>a if condition else b
-    </code></pre>
+    def test_classifier(self):
 
-    <p>First <code>condition</code> is evaluated, then exactly one of either <code>a</code> or <code>b</code> is evaluated and returned based on the <a href="https://en.wikipedia.org/wiki/Boolean_data_type" rel="noreferrer" title="Boolean data type">Boolean</a> value of <code>condition</code>. If <code>condition</code> evaluates to <code>True</code>, then <code>a</code> is evaluated and returned but <code>b</code> is ignored, or else when <code>b</code> is evaluated and returned but <code>a</code> is ignored.</p>
-
-    <p>This allows short-circuiting because when <code>condition</code> is true only <code>a</code> is evaluated and <code>b</code> is not evaluated at all, but when <code>condition</code> is false only <code>b</code> is evaluated and <code>a</code> is not evaluated at all.</p>
-
-    <p>For example:</p>
-
-    <pre><code>&gt;&gt;&gt; 'true' if True else 'false'
-    'true'
-    &gt;&gt;&gt; 'true' if False else 'false'
-    'false'
-    </code></pre>
-
-    <p>Note that conditionals are an <em>expression</em>, not a <em>statement</em>. This means you can't use assignment statements or <code>pass</code> or other <strong>statements</strong> within a conditional <strong>expression</strong>:</p>
-
-    <pre><code>&gt;&gt;&gt; pass if False else x = 3
-      File "&lt;stdin&gt;", line 1
-        pass if False else x = 3
-              ^
-    SyntaxError: invalid syntax
-    </code></pre>
-
-    <p>You can, however, use conditional expressions to assign a variable like so:</p>
-
-    <pre><code>x = a if True else b
-    </code></pre>
-
-    <p>Think of the conditional expression as switching between two values. It is very useful when you're in a 'one value or another' situation, it but doesn't do much else.</p>
-
-    <p>If you need to use statements, you have to use a normal <code>if</code> <strong>statement</strong> instead of a conditional <strong>expression</strong>.</p>
-
-    <hr>
-
-    <p>Keep in mind that it's frowned upon by some Pythonistas for several reasons:</p>
-
-    <ul>
-    <li>The order of the arguments is different from those of the classic <code>condition ? a : b</code> ternary operator from many other languages (such as C, C++, Go, Perl, Ruby, Java, Javascript, etc.), which may lead to bugs when people unfamiliar with Python's "surprising" behaviour use it (they may reverse the argument order).</li>
-    <li>Some find it "unwieldy", since it goes contrary to the normal flow of thought (thinking of the condition first and then the effects).</li>
-    <li>Stylistic reasons. (Although the 'inline <code>if</code>' can be <em>really</em> useful, and make your script more concise, it really does complicate your code)</li>
-    </ul>
-
-    <p>If you're having trouble remembering the order, then remember that when read aloud, you (almost) say what you mean. For example, <code>x = 4 if b &gt; 8 else 9</code> is read aloud as <code>x will be 4 if b is greater than 8 otherwise 9</code>.</p>
-
-    <p>Official documentation:     </p>
-
-    <ul>
-    <li><a href="https://docs.python.org/3/reference/expressions.html#conditional-expressions" rel="noreferrer" title="Conditional expressions">Conditional expressions</a></li>
-    <li><a href="https://docs.python.org/3.3/faq/programming.html#is-there-an-equivalent-of-c-s-ternary-operator" rel="noreferrer" title="Is there an equivalent of C’s ”?:” ternary operator?">Is there an equivalent of C’s ”?:” ternary operator?</a></li>
-    </ul>
-        """
-    ]
-
-    def test_transform(self):
-        preprocessor = Preprocessor(
-            word2vec_model_src="/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/model/word2vec.model"
+        classifier_pipeline = ClassifierPipeline(
+            word2vec_model_src="/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/model/word2vec.model",
+            scaler_model_src="/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/model/scaler.model",
+            classifier_model_src="/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/model/gradient_boosting_classifier.model"
         )
 
-        x_str = preprocessor.transform(self.data_for_test_preprocessor, vectorize=False)
-        x_not_reduced = preprocessor.transform(self.data_for_test_preprocessor, reducer=None)
-        x = preprocessor.transform(self.data_for_test_preprocessor)
+        y = classifier_pipeline.predict([self.data_for_test_classifier_pipeline])
+        sentences = classifier_pipeline.preprocessor.extract_clean_sentences(self.data_for_test_classifier_pipeline)
 
-        assert len(x_str) == len(x_not_reduced) == len(x)
-        assert len(x_str[0]) == len(x_not_reduced[0]) == x[0].shape[0]
-        assert x_not_reduced[0][0].shape[1] == x[0][0].shape[0]
+        assert len(y) == len(sentences)
