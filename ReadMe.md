@@ -69,7 +69,7 @@ To develop this project I followed these steps:
 
 
 A few examples of the features that were developed during this project:
-- Interactive visualisation of the KMeans results
+- Interactive visualisation of the KMeans results. The approach did not work at the end (I identified clusters related to the technologies mentionned in the questions e.g. numpy, tensorflow, docker, etc. instead of `solution` or `root_cause`) 
 
 ![](/img/tsne.gif)
 
@@ -78,16 +78,25 @@ A few examples of the features that were developed during this project:
 
 ### 2.3. Results
 
+The definition of `root_cause` and `solution` is a bit fuzzy, and while labelling the data it was not always very clear if a sentence really belonged to one class or another.
+Therefore, the performance of the model depends a lot on the quality of this labelled data ...
 
-<img src = "/img/classification_result.png" height="250">
+I analyzed the performance of the model:
+- with a 5-fold cross-validation using `macro` metrics,
+- and split the data in 70%/30% train-test to generate a classification report and a confusion matrix
 
+<img src = "/img/classification_result.png" height="300">
 
+As I did not use any technique to handle the class imbalance, it appears that the most common class (`other`) is the best predicted. Performance on the `root_cause` class is acceptable, while the prediction on the `solution` class is not very powerful...
+One potential explanation is that `root_cause` explanations are often longer than a simple solution and may contain more signal.
 
-<img src = "/img/cli_classifier_failed.png" height="250">
+A few examples of predictions (the first 2 seem to work, the last one is a failure) using the interface: 
 
-<img src = "/img/cli_classifier_root_cause.png" height="250">
+<img src = "/img/cli_classifier_failed.png" height="300">
 
-<img src = "/img/cli_classifier_solution.png" height="250">
+<img src = "/img/cli_classifier_root_cause.png" height="300">
+
+<img src = "/img/cli_classifier_solution.png" height="300">
 
 
 ## 3. How to reproduce the code
