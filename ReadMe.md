@@ -105,6 +105,8 @@ Still under construction (code is not 100% reproducible as of today)
 
 Some commands to execute / scripts to run (you might need to add `PYTHONPATH=.` before executing the command):
 
+___
+
 Collect data: `python stack_under_flow/adhoc_scripts/collect_data.py`
 
 Train the word2vec model: `python stack_under_flow/adhoc_scripts/train_embeddings.py`
