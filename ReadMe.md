@@ -2,7 +2,7 @@
 
 ## 1. Problem & context
 
-This project is an home assignment given to me by [PacketAI](http://www.packetai.co/). The problem is stated as:
+This project is an home assignment given to me by [<img src = "/img/packetai.svg" height="20">](http://www.packetai.co/). The problem is stated as:
 
 We want to build a tool that scrapes the Stackoverflow website and for every question (generally a question reflects a symptom of a problem) it predicts two things:
 - The root cause of the problem
