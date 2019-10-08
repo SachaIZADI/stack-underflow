@@ -58,44 +58,30 @@ I identified 3 potential approaches to solve the problem on this type of questio
 
 To develop this project I followed these steps:
 
-|     Tag     |       Constraint      |             Impact            |                                Solution                               | Priority |
-|:-----------:|:---------------------:|:-----------------------------:|:---------------------------------------------------------------------:|:--------:|
-| project mgt | ~2h                   | Better done than perfect      | Simple model                                                          | High     |
-| project mgt | peer-reviewed code    | Clean & functional code       | Git workflow + Limited usage of Jupyter                               | High     |
-| projec  mgt | reusable code         | Clean & functional code       | Modular code + basic documentation                                    | High     |
-| project mgt | trustworthy code      | Code needs to be tested       | pytest + CI/CD (GitHub actions)                                       | Medium   |
-| data        | no data is provided   | Build an adhoc dataset        | Scrap StackOverFlow                                                   | High     |
-| data        | no label is provided  | Supervised learning is costly | Label data by hand / Semi-supervised learning / Unsupervised learning | High     |
-| data        | no data is provided   | DeepLearning is out of reach  | Simple model / or fine-tuning                                         | High     |
-| hardware    | no GPU                | DeepLearning is out of reach  | Simple model (statistical learning + feature engineering)             | High     |
-| model       | fast & scalable model | Optimize inference time       | Simple model (statistical learning + feature engineering)             | High     |
-| production  | deployable model      | APIze the model / pipeline    | Docker + Flask + Setup a server (AWS, Heroku ...)                     | Low      |
+| step |      functionnality      |                                                                                                        description                                                                                                       |                                                                    url                                                                    |
+|:----:|:------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------:|
+|   1  |        WebCrawler        | - crawler to collect questions & answers data - relies on StackOverflow API - can automatically generate an API key - useful for creating a training set                                                                 | [crawler](https://github.com/SachaIZADI/stack-underflow/blob/feature/ReadMe/stack_under_flow/crawler/stack_over_flow.py)                  |
+|   2  |       Preprocessing      | - methods to preprocess the html content of an answer - cleans text (remove tags, lemmatizes, tokenizes...) - vectorizes (custom word2vec trained on the dataset)                                                        | [preprocessing](https://github.com/SachaIZADI/stack-underflow/blob/feature/ReadMe/stack_under_flow/model/preprocessing.py)                |
+|   3  |      Data Labelling      | - interface (CLI) to label the data more easily                                                                                                                                                                          | [labelling](https://github.com/SachaIZADI/stack-underflow/blob/feature/ReadMe/stack_under_flow/labelling_tool/labelling_cli.py)           |
+| 3bis | Unsupervised exploration | - tried (but failed) to analyze the dataset with Kmeans - aim was to identify potential clusters that would include `solution`, `root_cause` and avoid hand labelling - interactive visualizations                       | [kmeans](https://github.com/SachaIZADI/stack-underflow/blob/feature/ReadMe/stack_under_flow/adhoc_scripts/unsupervised_exploration.ipynb) |
+|   4  |        Classifier        | - gradient-boosted classifier that classifies each sentence in `solution`, `root_cause` or `other` - little hyperparameter-tuning was done, but the model performance were estimated using cross-validation and hold-out | [classifier](https://github.com/SachaIZADI/stack-underflow/blob/feature/ReadMe/stack_under_flow/model/classifier.py)                      |
+|   5  |         Interface        | - interface (CLI) to use the model & play with it - pass an url or a question id and visualize the results of the algorithm                                                                                              | [interface](https://github.com/SachaIZADI/stack-underflow/blob/feature/ReadMe/stack_under_flow/stack_under_flow_cli.py)                   |
 
 
-Based on the analysis we made of the problem and given the constraints, we will:
-
-1. Build a scrapper to extract the content of a StackOverflow question (question, answers, metadata)
-2. Build a dataset of ~100's or ~1000's of questions
-3. Build a 3-class classifier (`solution`, `root_cause`, `other`) at the sentence level.
-    1. The model:
-        - A +/- advanced model would be to use the content from **both** the sentence **and** the question to predict the class of the sentence: ![equation](https://latex.codecogs.com/gif.latex?\mathbb{P}(label=solution&space;|&space;question,&space;sentence&space;))
-        - We will adopt a simpler approach and **only** use the content from the sentence: ![equation](https://latex.codecogs.com/gif.latex?\mathbb{P}(label=solution&space;|&space;sentence&space;)). Our rational is that the `solution` class could be predicted by textual elements such as {`I suggest that`, `you should do`} and that an top-voted answer is related enough to the question that we do not need to check for the relevance of the sentence with respect to the initial question.
-    2. The labels:
-        - First try if an unsupervised approach could yield to well identified classes that includes  (`solution`, `root_cause`), this would avoid having to manually label sentences. Otherwise we'll have to do a bit of data labelling.
-    3. Extracting sentences:
-        - StackOverflow answers not only contain natural language sentences, they also contain code snippets. We might have to replace all code snippets by a [CODE] token.
-    4. The features:
-        - We will remove the stopwords
-        - Use a bag-of-words model on top of 1,2,3-grams (to capture relations such as `import library works)`
-        - Train our own word embeddings
-        - We also might use additional metadata (e.g. Markdown elements) as a solution.
-
+A few examples of the features that were developed during this project:
+- Interactive visualisation of the KMeans results
 
 ![](/img/tsne.gif)
 
+- Labelling interface
 <img src = "/img/labelling.gif" height="400">
 
+### 2.3. Results
+
+
 <img src = "/img/classification_result.png" height="250">
+
+
 
 <img src = "/img/cli_classifier_failed.png" height="250">
 
