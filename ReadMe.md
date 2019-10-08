@@ -25,13 +25,15 @@ Bonus point:
 - Document the code.
 
 
-## 2. Modelisation
+## 2. Modelisation & Development
 
 
 ### 2.1. Problem understanding and simplification
 
 Given the constraints, I decided to focus my efforts on Questions that have an accepted answer:
-<img src = "/img/answered_question.jpg" height="300">
+
+<img src = "/img/answered_question.png" height="300">
+
 The rational being that if an answer is accepted, it is more likely that it mentions a solution to the problem and/or a root cause.
 
 
@@ -52,7 +54,23 @@ I identified 3 potential approaches to solve the problem on this type of questio
     - This approach would give a full sentence as a result to the initial problem without completely filtering the sentence from the content not relevant to the solution.
 
 
-### 2.2. Development steps
+### 2.2. Project structure
+
+To develop this project I followed these steps:
+
+|     Tag     |       Constraint      |             Impact            |                                Solution                               | Priority |
+|:-----------:|:---------------------:|:-----------------------------:|:---------------------------------------------------------------------:|:--------:|
+| project mgt | ~2h                   | Better done than perfect      | Simple model                                                          | High     |
+| project mgt | peer-reviewed code    | Clean & functional code       | Git workflow + Limited usage of Jupyter                               | High     |
+| projec  mgt | reusable code         | Clean & functional code       | Modular code + basic documentation                                    | High     |
+| project mgt | trustworthy code      | Code needs to be tested       | pytest + CI/CD (GitHub actions)                                       | Medium   |
+| data        | no data is provided   | Build an adhoc dataset        | Scrap StackOverFlow                                                   | High     |
+| data        | no label is provided  | Supervised learning is costly | Label data by hand / Semi-supervised learning / Unsupervised learning | High     |
+| data        | no data is provided   | DeepLearning is out of reach  | Simple model / or fine-tuning                                         | High     |
+| hardware    | no GPU                | DeepLearning is out of reach  | Simple model (statistical learning + feature engineering)             | High     |
+| model       | fast & scalable model | Optimize inference time       | Simple model (statistical learning + feature engineering)             | High     |
+| production  | deployable model      | APIze the model / pipeline    | Docker + Flask + Setup a server (AWS, Heroku ...)                     | Low      |
+
 
 Based on the analysis we made of the problem and given the constraints, we will:
 
