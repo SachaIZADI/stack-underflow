@@ -113,6 +113,7 @@ Based on the analysis we made of the problem and given the constraints, we will:
         - Train our own word embeddings
         - We also might use additional metadata (e.g. Markdown elements) as a solution.
 
+![](/img/tsne.gif)
 
 
 ## 3. How to reproduce the code

@@ -221,12 +221,12 @@ class Preprocessor(BaseEstimator, TransformerMixin):
 
         model = gensim.models.Word2Vec(
             sentences,
-            sg=1,
+            sg=0,
             size=100,
-            window=10,
+            window=15,
             min_count=2,
             workers=2,
-            iter=20)
+            iter=50)
 
         return model
 
