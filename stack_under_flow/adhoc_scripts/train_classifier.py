@@ -3,6 +3,7 @@ from stack_under_flow.model.classifier import Classifier
 
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import cross_validate, train_test_split
+import joblib
 
 import json
 import numpy as np
@@ -60,6 +61,16 @@ def main():
     # Final training
     classifier = Classifier()
     classifier.fit(X, y)
+
+    joblib.dump(
+        classifier.classifier,
+        "/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/model/gradient_boosting_classifier.model"
+    )
+
+    joblib.dump(
+        classifier.scaler,
+        "/Users/sachaizadi/Documents/Projets/stack_under_flow/stack_under_flow/model/scaler.model"
+    )
 
 
 if __name__ == "__main__":

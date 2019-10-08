@@ -114,7 +114,7 @@ Based on the analysis we made of the problem and given the constraints, we will:
         - We also might use additional metadata (e.g. Markdown elements) as a solution.
 
 
-<img src = "/img/tsne.gif" height="400">
+![](/img/tsne.gif)
 
 <img src = "/img/labelling.gif" height="400">
 
