@@ -120,6 +120,12 @@ Based on the analysis we made of the problem and given the constraints, we will:
 
 <img src = "/img/classification_result.png" height="250">
 
+<img src = "/img/cli_classifier_failed.png" height="250">
+
+<img src = "/img/cli_classifier_root_cause.png" height="250">
+
+<img src = "/img/cli_classifier_solution.png" height="250">
+
 
 ## 3. How to reproduce the code
 Run the tests: `PYTHONPATH=. py.test`

@@ -102,24 +102,5 @@ def main(path_to_data, nb_examples):
     print(f"Data was saved to {path_to_data}/data_labeled.json")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    pass
-
-
-
-
-
-
 if __name__ == "__main__":
     main()

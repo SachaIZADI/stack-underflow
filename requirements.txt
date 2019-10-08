@@ -10,6 +10,7 @@ botocore==1.12.243
 bs4==0.0.1
 certifi==2019.9.11
 chardet==3.0.4
+Click==7.0
 cycler==0.10.0
 decorator==4.4.0
 defusedxml==0.6.0
@@ -53,6 +54,7 @@ prometheus-client==0.7.1
 prompt-toolkit==2.0.10
 ptyprocess==0.6.0
 py==1.8.0
+pyfiglet==0.8.post1
 Pygments==2.4.2
 pyparsing==2.4.2
 pyrsistent==0.15.4
@@ -72,6 +74,7 @@ six==1.12.0
 sklearn==0.0
 smart-open==1.8.4
 soupsieve==1.9.4
+termcolor==1.1.0
 terminado==0.8.2
 testpath==0.4.2
 tornado==6.0.3

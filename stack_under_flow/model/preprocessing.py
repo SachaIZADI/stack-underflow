@@ -261,6 +261,17 @@ class Preprocessor(BaseEstimator, TransformerMixin):
 
         return X_transformed
 
+    def extract_raw_sentences(self, X:Iterable[str]):
+        html_2_text_vect = np.vectorize(self.html_2_text)
+        expand_contraction_vect = np.vectorize(self.expand_contraction)
+        get_sentences_vect = np.vectorize(lambda x: self.get_sentences(x, remove_punctuation=False, lemmatize=False), otypes=[list])
+
+        X_transformed = html_2_text_vect(X)
+        X_transformed = expand_contraction_vect(X_transformed)
+        X_transformed = get_sentences_vect(X_transformed)
+
+        return X_transformed
+
     # --------------------------
 
     def fit(self, X: Iterable[str], y=None):
