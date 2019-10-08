@@ -92,15 +92,31 @@ One potential explanation is that `root_cause` explanations are often longer tha
 
 A few examples of predictions (the first 2 seem to work, the last one is a failure) using the interface: 
 
-<img src = "/img/cli_classifier_failed.png" height="300">
+<img src = "/img/cli_classifier_root_cause.png" height="350">
 
-<img src = "/img/cli_classifier_root_cause.png" height="300">
+<img src = "/img/cli_classifier_solution.png" height="350">
 
-<img src = "/img/cli_classifier_solution.png" height="300">
+<img src = "/img/cli_classifier_failed.png" height="250">
 
 
 ## 3. How to reproduce the code
-Run the tests: `PYTHONPATH=. py.test`
 
+Still under construction (code is not 100% reproducible as of today)
 
-Under construction
+Some commands to execute / scripts to run (you might need to add `PYTHONPATH=.` before executing the command):
+
+Collect data: `python stack_under_flow/adhoc_scripts/collect_data.py`
+
+Train the word2vec model: `python stack_under_flow/adhoc_scripts/train_embeddings.py`
+
+Train the classifier: `python stack_under_flow/adhoc_scripts/train_classifier.py`
+
+___
+
+Launch the Labelling CLI: `python stack_under_flow/labelling_tool/labelling_cli.py -n 5`
+
+Launch the Labelling CLI: `python stack_under_flow/stack_under_flow_cli.py -id 46826218`
+
+___
+
+Run the tests: `py.test`
